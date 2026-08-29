@@ -68,7 +68,7 @@ module Elelem
 
       def call(name, args)
         result = request("tools/call", { name: name, arguments: args })
-        logger.info({ tool: name, args: args, result: result }.to_json)
+        Elelem.logger.info({ tool: name, args: args, result: result }.to_json)
         content = extract_content(result)
         result["isError"] ? { error: content } : { content: content }
       end
@@ -79,10 +79,6 @@ module Elelem
         else
           result["content"]&.map { |c| c["text"] }&.join("\n")
         end
-      end
-
-      def logger
-        @logger ||= Logger.new(File.expand_path("~/.elelem/mcp.log"))
       end
 
       private
