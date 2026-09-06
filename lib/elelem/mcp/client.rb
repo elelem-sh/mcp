@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "elelem/version"
 require "json"
 require "net/http"
 require "open3"
