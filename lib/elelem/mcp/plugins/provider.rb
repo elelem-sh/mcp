@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
-require "elelem"
-require_relative "../mcp"
+require "elelem/plugins"
+require_relative "../../mcp"
 
 Elelem::Plugins.register(:mcp) do |agent|
-  mcp = Elelem::MCP::Client.new
-  at_exit { mcp.close }
+  mcp = Elelem::MCP::Client.memoized
 
   Thread.new do
     mcp.tools.each do |name, tool|
+      next if agent.toolbox.tools.key?(name)
+
       agent.toolbox.add(
         name,
         description: tool[:description],

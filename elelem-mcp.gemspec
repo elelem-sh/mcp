@@ -18,18 +18,11 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://git.mokhan.ca/xlgmokha/elelem.git"
 
-  spec.files = [
-    "LICENSE.txt",
-    "lib/elelem/mcp.rb",
-    "lib/elelem/mcp/version.rb",
-    "lib/elelem/mcp/client.rb",
-    "lib/elelem/mcp/token_storage.rb",
-    "lib/elelem/mcp/plugin.rb",
-  ]
+  spec.files = ["LICENSE.txt", "lib/elelem/mcp.rb"] + Dir["lib/elelem/mcp/**/*.{rb}"]
   spec.require_paths = ["lib"]
 
   spec.add_dependency "digest", "~> 3.2"
-  spec.add_dependency "elelem", "~> 0.1"
+  spec.add_dependency "elelem-plugins", "~> 0.1"
   spec.add_dependency "fileutils", "~> 1.8"
   spec.add_dependency "json", "~> 2.21"
   spec.add_dependency "net-http", "~> 0.9"

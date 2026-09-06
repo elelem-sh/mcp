@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "elelem/version"
+require_relative "version"
 require "json"
 require "net/http"
 require "open3"
@@ -14,6 +14,10 @@ module Elelem
         "~/.agents/mcp.json",
         ".agents/mcp.json"
       ].freeze
+
+      def self.memoized
+        @memoized ||= new.tap { |client| at_exit { client.close } }
+      end
 
       def initialize(configurations = CONFIG_PATHS)
         @config = load_config(configurations)
@@ -92,7 +96,7 @@ module Elelem
         request("initialize", {
           protocolVersion: "2025-06-18",
           capabilities: {},
-          clientInfo: { name: "elelem", version: Elelem::VERSION }
+          clientInfo: { name: "elelem", version: Elelem::MCP::VERSION }
         })
         notify("notifications/initialized")
       end
