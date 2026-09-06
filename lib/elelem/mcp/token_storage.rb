@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require "digest"
-require "fileutils"
-require "json"
-
 module Elelem
   module MCP
     class TokenStorage

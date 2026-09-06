@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "version"
-require "json"
-require "net/http"
-require "open3"
-require "uri"
-
 module Elelem
   module MCP
     # https://modelcontextprotocol.io/specification/2025-11-25/server/tools.md

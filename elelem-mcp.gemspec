@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "digest", "~> 3.2"
-  spec.add_dependency "elelem-plugins", "~> 0.1"
+  spec.add_dependency "elelem", "~> 0.1"
   spec.add_dependency "fileutils", "~> 1.8"
   spec.add_dependency "json", "~> 2.21"
   spec.add_dependency "net-http", "~> 0.9"
