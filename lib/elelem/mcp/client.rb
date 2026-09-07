@@ -25,7 +25,7 @@ module Elelem
               "#{name}_#{tool["name"]}",
               {
                 description: tool["description"],
-                params: tool.dig("inputSchema", "properties") || {},
+                params: symbolize(tool.dig("inputSchema", "properties") || {}),
                 required: tool.dig("inputSchema", "required") || [],
                 fn: ->(a) { server(name).call(tool["name"], a) }
               }
@@ -39,6 +39,10 @@ module Elelem
       end
 
       private
+
+      def symbolize(hash)
+        JSON.parse(JSON.generate(hash), symbolize_names: true)
+      end
 
       def load_config(configurations)
         configurations.each_with_object({}) do |path, merged|
