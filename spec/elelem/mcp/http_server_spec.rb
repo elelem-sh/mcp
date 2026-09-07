@@ -72,6 +72,7 @@ RSpec.describe Elelem::MCP::HttpServer do
       server = described_class.allocate
       server.instance_variable_set(:@headers, {})
       server.instance_variable_set(:@session_id, nil)
+      server.instance_variable_set(:@access_token, nil)
       server
     end
 
@@ -84,6 +85,12 @@ RSpec.describe Elelem::MCP::HttpServer do
       subject.instance_variable_set(:@session_id, "abc123")
       headers = subject.send(:request_headers)
       expect(headers["Mcp-Session-Id"]).to eq("abc123")
+    end
+
+    it "includes authorization when access_token set" do
+      subject.instance_variable_set(:@access_token, "token123")
+      headers = subject.send(:request_headers)
+      expect(headers["Authorization"]).to eq("Bearer token123")
     end
   end
 end

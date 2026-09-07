@@ -1,15 +1,20 @@
 # frozen_string_literal: true
 
+require "base64"
 require "digest"
 require "elelem"
 require "fileutils"
 require "json"
 require "net/http"
 require "open3"
+require "securerandom"
+require "timeout"
 require "uri"
+require "webrick"
 
 require_relative "mcp/version"
 require_relative "mcp/token_storage"
+require_relative "mcp/oauth"
 require_relative "mcp/client"
 
 Elelem::Plugins.register(:mcp) do |agent|

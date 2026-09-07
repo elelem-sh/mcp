@@ -157,6 +157,7 @@ module Elelem
         @open_timeout = open_timeout
         @id = 0
         @session_id = nil
+        @access_token = nil
         handshake!
       end
 
@@ -185,7 +186,7 @@ module Elelem
         post(msg)
       end
 
-      def post(msg)
+      def post(msg, retry_auth: true)
         request = Net::HTTP::Post.new(@uri)
         request["content-type"] = "application/json"
         request_headers.each { |k, v| request[k] = v }
@@ -204,7 +205,10 @@ module Elelem
               return parse_response(response)
             when Net::HTTPUnauthorized
               response.body
-              raise "MCP: server requires OAuth (not yet supported)"
+              raise "Authorization failed" unless retry_auth
+
+              @access_token = OAuth.new(@uri.to_s).token
+              return post(msg, retry_auth: false)
             else
               raise "HTTP #{response.code}: #{response.body}"
             end
@@ -215,6 +219,7 @@ module Elelem
       def request_headers
         base = { "Accept" => "application/json, text/event-stream" }
         base["Mcp-Session-Id"] = @session_id if @session_id
+        base["Authorization"] = "Bearer #{@access_token}" if @access_token
         @headers.merge(base)
       end
 
