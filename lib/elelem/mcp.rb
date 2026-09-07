@@ -17,22 +17,24 @@ require_relative "mcp/token_storage"
 require_relative "mcp/oauth"
 require_relative "mcp/client"
 
-Elelem::Plugins.register(:mcp) do |agent|
-  mcp = Elelem::MCP::Client.memoized
+Elelem.configure do |config|
+  config.setup(:mcp) do |agent|
+    mcp = Elelem::MCP::Client.memoized
 
-  Thread.new do
-    mcp.tools.each do |name, tool|
-      next if agent.toolbox.tools.key?(name)
+    Thread.new do
+      mcp.tools.each do |name, tool|
+        next if agent.toolbox.tools.key?(name)
 
-      agent.toolbox.add(
-        name,
-        description: tool[:description],
-        params: tool[:params],
-        required: tool[:required],
-        &tool[:fn]
-      )
+        agent.toolbox.add(
+          name,
+          description: tool[:description],
+          params: tool[:params],
+          required: tool[:required],
+          &tool[:fn]
+        )
+      end
+    rescue => e
+      warn "MCP failed: #{e.message}"
     end
-  rescue => e
-    warn "MCP failed: #{e.message}"
   end
 end
