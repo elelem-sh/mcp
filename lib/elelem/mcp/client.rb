@@ -49,7 +49,7 @@ module Elelem
           file = File.expand_path(path)
           next unless File.exist?(file)
 
-          config = JSON.parse(IO.read(file))
+          config = JSON.parse(File.read(file))
           servers = config.fetch("mcpServers", {})
           merged["mcpServers"] = (merged["mcpServers"] || {}).merge(servers)
         end
@@ -92,10 +92,10 @@ module Elelem
 
       def handshake!
         request("initialize", {
-          protocolVersion: "2025-06-18",
-          capabilities: {},
-          clientInfo: { name: "elelem", version: Elelem::MCP::VERSION }
-        })
+                  protocolVersion: "2025-06-18",
+                  capabilities: {},
+                  clientInfo: { name: "elelem", version: Elelem::MCP::VERSION }
+                })
         notify("notifications/initialized")
       end
     end
@@ -105,7 +105,9 @@ module Elelem
 
       def initialize(command:, args: [], env: {})
         resolved_env = env.transform_values do |v|
-          v.gsub(/\$\{(\w+)\}/) { ENV[$1] || raise("Missing environment variable: #{$1}") }
+          v.gsub(/\$\{(\w+)\}/) do
+            ENV[::Regexp.last_match(1)] || raise("Missing environment variable: #{::Regexp.last_match(1)}")
+          end
         end
         @stdin, @stdout, @stderr, @wait = Open3.popen3(resolved_env, command, *args)
         @id = 0
@@ -172,7 +174,7 @@ module Elelem
       def resolve_headers(headers)
         headers.transform_values do |v|
           v.gsub(/\$\{(\w+)\}/) do
-            ENV[$1] || raise("Missing environment variable: #{$1}")
+            ENV[::Regexp.last_match(1)] || raise("Missing environment variable: #{::Regexp.last_match(1)}")
           end
         end
       end

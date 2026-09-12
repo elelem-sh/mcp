@@ -3,8 +3,8 @@
 module Elelem
   module MCP
     class OAuth
-      CALLBACK_PORT = 18273
-      REDIRECT_URI = "http://127.0.0.1:#{CALLBACK_PORT}/callback"
+      CALLBACK_PORT = 18_273
+      REDIRECT_URI = "http://127.0.0.1:#{CALLBACK_PORT}/callback".freeze
 
       def initialize(resource_url, http: HttpAdapter.new)
         @resource_url = resource_url
@@ -138,11 +138,9 @@ module Elelem
       end
 
       def open_browser(url)
-        commands = ["xdg-open", "open", "start"]
-        commands.each do |cmd|
-          return if system(cmd, url, out: File::NULL, err: File::NULL)
-        end
-        warn "Open this URL in your browser: #{url}"
+        commands = %w[xdg-open open start]
+        opened = commands.any? { |cmd| system(cmd, url, out: File::NULL, err: File::NULL) }
+        warn "Open this URL in your browser: #{url}" unless opened
       end
 
       def wait_for_callback(expected_state)

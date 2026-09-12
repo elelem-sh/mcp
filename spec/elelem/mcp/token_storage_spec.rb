@@ -7,7 +7,11 @@ RSpec.describe Elelem::MCP::TokenStorage do
   let(:token_dir) { File.expand_path("~/.config/elelem/tokens") }
 
   after do
-    Dir.glob(File.join(token_dir, "*.json")).each { |f| File.delete(f) rescue nil }
+    Dir.glob(File.join(token_dir, "*.json")).each do |f|
+      File.delete(f)
+    rescue StandardError
+      nil
+    end
   end
 
   describe "#save and #load" do

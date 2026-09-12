@@ -33,7 +33,7 @@ Elelem.configure do |config|
           &tool[:fn]
         )
       end
-    rescue => e
+    rescue StandardError => e
       warn "MCP failed: #{e.message}"
     end
   end

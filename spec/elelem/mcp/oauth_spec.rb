@@ -15,9 +15,9 @@ RSpec.describe Elelem::MCP::OAuth do
     context "with valid cached token" do
       it "returns cached access_token" do
         allow(storage).to receive(:load).with(resource_url).and_return({
-          access_token: "cached_token",
-          expires_at: Time.now.to_i + 3600
-        })
+                                                                         access_token: "cached_token",
+                                                                         expires_at: Time.now.to_i + 3600
+                                                                       })
 
         expect(subject.token).to eq("cached_token")
       end
@@ -34,14 +34,14 @@ RSpec.describe Elelem::MCP::OAuth do
 
       it "refreshes using refresh_token" do
         allow(storage).to receive(:load).with(resource_url).and_return({
-          access_token: "old_token",
-          refresh_token: "refresh_abc",
-          expires_at: Time.now.to_i - 100
-        })
+                                                                         access_token: "old_token",
+                                                                         refresh_token: "refresh_abc",
+                                                                         expires_at: Time.now.to_i - 100
+                                                                       })
 
         allow(storage).to receive(:load_client).with(resource_url).and_return({
-          client_id: "elelem-123"
-        })
+                                                                                client_id: "elelem-123"
+                                                                              })
 
         resource_response = double(body: { "authorization_servers" => ["https://auth.example.com"] }.to_json)
         auth_response = double(body: auth_metadata.to_json)
