@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "base64", "~> 0.3"
   spec.add_dependency "digest", "~> 3.2"
-  spec.add_dependency "elelem", "~> 0.1"
+  spec.add_dependency "elelem", "~> 0.12"
   spec.add_dependency "fileutils", "~> 1.8"
   spec.add_dependency "json", "~> 3.0"
   spec.add_dependency "net-http", "~> 0.9"
