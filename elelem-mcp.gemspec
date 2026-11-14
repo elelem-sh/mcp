@@ -10,12 +10,12 @@ Gem::Specification.new do |spec|
 
   spec.summary = "MCP (Model Context Protocol) client support for elelem."
   spec.description = "Adds MCP server tool discovery (stdio and HTTP transports) as elelem tools."
-  spec.homepage = "https://src.mokhan.ca/elelem/mcp"
+  spec.homepage = "https://elelem.sh"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 4.0.0"
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = spec.homepage
+  spec.metadata["source_code_uri"] = "https://github.com/elelem-sh/mcp"
   spec.metadata["rubygems_mfa_required"] = "true"
 
   gemspec = File.basename(__FILE__)
