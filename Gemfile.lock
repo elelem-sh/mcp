@@ -4,7 +4,7 @@ PATH
     elelem-mcp (0.2.0)
       base64 (~> 0.3)
       digest (~> 3.2)
-      elelem (~> 0.12)
+      elelem (>= 0.12, < 1)
       fileutils (~> 1.8)
       json (~> 3.0)
       net-http (~> 0.9)
