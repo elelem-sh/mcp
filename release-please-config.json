@@ -1,0 +1,10 @@
+{
+  "bootstrap-sha": "f51f7a671b8a01de32b68b83f9b6a92a0f91b206",
+  "packages": {
+    ".": {
+      "release-type": "ruby",
+      "package-name": "elelem-mcp",
+      "version-file": "lib/elelem/mcp/version.rb"
+    }
+  }
+}
