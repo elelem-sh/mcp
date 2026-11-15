@@ -26,6 +26,21 @@ RSpec.describe Elelem::MCP::Client do
     expect(client.tools_for("echo").keys).to eq(["echo_say"])
   end
 
+  it "answers when the server writes a lot to stderr" do
+    noisy = { "command" => RbConfig.ruby, "args" => [File.expand_path("../../fixtures/noisy_server.rb", __dir__)] }
+    File.write(config, JSON.generate("mcpServers" => { "noisy" => noisy }))
+
+    Timeout.timeout(10) { expect(client.tools_for("noisy").keys).to eq(["noisy_say"]) }
+  end
+
+  it "accepts type stdio, and takes a url without a type as http" do
+    servers = { "s" => echo.merge("type" => "stdio"), "h" => { "url" => "http://127.0.0.1:1/mcp" } }
+    File.write(config, JSON.generate("mcpServers" => servers))
+
+    expect(client.tools_for("s").keys).to eq(["s_say"])
+    expect { client.tools_for("h") }.to raise_error(SystemCallError)
+  end
+
   it "calls a loaded tool" do
     expect(client.tools_for("echo")["echo_say"][:fn].call("text" => "hi")).to eq(content: "hi")
   end

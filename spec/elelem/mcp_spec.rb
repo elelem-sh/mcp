@@ -24,9 +24,14 @@ RSpec.describe "the mcp setup" do
   end
 
   def run_setup
-    before = Thread.list
-    setup.call(Struct.new(:toolbox).new(toolbox))
-    (Thread.list - before).each(&:join)
+    setup.call(Struct.new(:toolbox).new(toolbox)).each(&:join)
+  end
+
+  it "waits for the servers before returning when the input is not interactive" do
+    session = Struct.new(:toolbox, :input).new(toolbox, Elelem::NullInput.new)
+    expect { setup.call(session) }.to output(/broken/).to_stderr
+
+    expect(toolbox.tools.keys).to include("echo_say")
   end
 
   it "loads the tools of a working server when another fails, and names the failure" do

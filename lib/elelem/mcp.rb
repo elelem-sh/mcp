@@ -17,17 +17,33 @@ require_relative "mcp/token_storage"
 require_relative "mcp/oauth"
 require_relative "mcp/client"
 
+module Elelem
+  module MCP
+    # Waits for every loader, but no more than timeout seconds in all.
+    def self.wait(threads, timeout: 30)
+      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+      threads.each { |t| t.join([deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC), 0].max) }
+    end
+
+    # A person at a terminal can start typing while servers load. A one-shot
+    # run, such as elelem ask, has to wait or its first turn has no MCP tools.
+    def self.interactive?(session)
+      !session.respond_to?(:input) || session.input.interactive?
+    end
+  end
+end
+
 Elelem.configure do |config|
-  config.setup(:mcp) do |agent|
+  config.setup(:mcp) do |session|
     mcp = Elelem::MCP::Client.memoized
 
     # One thread per server, so a broken or slow server does not hold back the others.
-    mcp.server_names.each do |server|
+    threads = mcp.server_names.map do |server|
       Thread.new do
         mcp.tools_for(server).each do |name, tool|
-          next if agent.toolbox.tools.key?(name)
+          next if session.toolbox.tools.key?(name)
 
-          agent.toolbox.add(
+          session.toolbox.add(
             name,
             description: tool[:description],
             params: tool[:params],
@@ -39,5 +55,7 @@ Elelem.configure do |config|
         $stderr.puts "elelem-mcp: #{server}: #{e.message}"
       end
     end
+    Elelem::MCP.wait(threads) unless Elelem::MCP.interactive?(session)
+    threads
   end
 end

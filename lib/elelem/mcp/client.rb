@@ -62,10 +62,11 @@ module Elelem
       end
 
       def build_server(config)
-        if config["type"] == "http"
-          HttpServer.new(url: config["url"], headers: config["headers"] || {})
-        else
-          Server.new(**config.transform_keys(&:to_sym))
+        config = config.dup
+        case config.delete("type") || (config.key?("url") ? "http" : "stdio")
+        when "http" then HttpServer.new(url: config["url"], headers: config["headers"] || {})
+        when "stdio" then Server.new(**config.transform_keys(&:to_sym))
+        else raise "unsupported type: #{config["type"]}"
         end
       end
     end
@@ -112,6 +113,7 @@ module Elelem
           end
         end
         @stdin, @stdout, @stderr, @wait = Open3.popen3(resolved_env, command, *args)
+        @drain = drain(@stderr)
         @id = 0
         handshake!
       end
@@ -123,11 +125,21 @@ module Elelem
           nil
         end
         @wait.kill
+        @drain.join(1)
       rescue StandardError
         nil
       end
 
       private
+
+      # A server that writes to stderr would block once the pipe fills, so read it.
+      def drain(io)
+        Thread.new do
+          io.each_line { |line| Elelem.logger.debug("mcp stderr: #{line.chomp}") }
+        rescue IOError
+          nil
+        end
+      end
 
       def request(method, params = {})
         send_msg(id: @id += 1, method: method, params: params)
