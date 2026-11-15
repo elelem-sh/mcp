@@ -104,3 +104,19 @@ RSpec.describe Elelem::MCP::OAuth, "callback" do
     oauth&.instance_variable_set(:@server, nil) # its at_exit shutdown must not reach the double
   end
 end
+
+RSpec.describe Elelem::MCP::OAuth, "discovery" do
+  it "keeps the port of the server's URL" do
+    http = double("http")
+    asked = []
+    allow(http).to receive(:get) do |url, &block|
+      asked << url
+      body = url.include?("protected-resource") ? { authorization_servers: ["http://auth:9000"] } : {}
+      block.call(double(body: JSON.generate(body)))
+    end
+
+    described_class.new("http://localhost:8080/mcp", http: http).send(:discover_auth_server)
+
+    expect(asked.first).to eq("http://localhost:8080/.well-known/oauth-protected-resource")
+  end
+end

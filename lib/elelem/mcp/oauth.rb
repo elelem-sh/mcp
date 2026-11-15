@@ -78,8 +78,7 @@ module Elelem
       end
 
       def discover_auth_server
-        resource_uri = URI.parse(@resource_url)
-        metadata_url = "#{resource_uri.scheme}://#{resource_uri.host}/.well-known/oauth-protected-resource"
+        metadata_url = URI.join(@resource_url, "/.well-known/oauth-protected-resource").to_s
 
         resource_metadata = fetch_json(metadata_url)
         auth_server_url = resource_metadata["authorization_servers"]&.first
