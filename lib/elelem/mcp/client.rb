@@ -77,7 +77,7 @@ module Elelem
 
       def call(name, args)
         result = request("tools/call", { name: name, arguments: args })
-        Elelem.logger.info({ tool: name, args: args, result: result }.to_json)
+        Elelem.logger.debug({ tool: name, args: args, result: result }.to_json)
         content = extract_content(result)
         result["isError"] ? { error: content } : { content: content }
       end

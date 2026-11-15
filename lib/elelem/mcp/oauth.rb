@@ -147,6 +147,7 @@ module Elelem
         code = nil
         @server = WEBrick::HTTPServer.new(
           Port: CALLBACK_PORT,
+          BindAddress: "127.0.0.1",
           Logger: WEBrick::Log.new(File::NULL),
           AccessLog: []
         )

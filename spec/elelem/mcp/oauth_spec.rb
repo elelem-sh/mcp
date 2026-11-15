@@ -90,3 +90,17 @@ RSpec.describe Elelem::MCP::OAuth do
     end
   end
 end
+
+RSpec.describe Elelem::MCP::OAuth, "callback" do
+  it "listens on 127.0.0.1 only" do
+    server = instance_double(WEBrick::HTTPServer, mount_proc: nil, shutdown: nil)
+    allow(server).to receive(:start) { raise Timeout::Error }
+    allow(WEBrick::HTTPServer).to receive(:new).and_return(server)
+
+    oauth = described_class.new("https://mcp.example.com/mcp", http: double("http"))
+    expect { oauth.send(:wait_for_callback, "state") }.to raise_error("OAuth callback timed out")
+    expect(WEBrick::HTTPServer).to have_received(:new).with(hash_including(BindAddress: "127.0.0.1"))
+  ensure
+    oauth&.instance_variable_set(:@server, nil) # its at_exit shutdown must not reach the double
+  end
+end
