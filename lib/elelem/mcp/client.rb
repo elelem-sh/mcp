@@ -63,10 +63,11 @@ module Elelem
 
       def build_server(config)
         config = config.dup
-        case config.delete("type") || (config.key?("url") ? "http" : "stdio")
+        type = config.delete("type") || (config.key?("url") ? "http" : "stdio")
+        case type
         when "http" then HttpServer.new(url: config["url"], headers: config["headers"] || {})
         when "stdio" then Server.new(**config.transform_keys(&:to_sym))
-        else raise "unsupported type: #{config["type"]}"
+        else raise "unsupported type: #{type}"
         end
       end
     end

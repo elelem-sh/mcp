@@ -41,6 +41,12 @@ RSpec.describe Elelem::MCP::Client do
     expect { client.tools_for("h") }.to raise_error(SystemCallError)
   end
 
+  it "names an unsupported type" do
+    File.write(config, JSON.generate("mcpServers" => { "x" => { "type" => "sse", "url" => "http://h/" } }))
+
+    expect { client.tools_for("x") }.to raise_error("unsupported type: sse")
+  end
+
   it "calls a loaded tool" do
     expect(client.tools_for("echo")["echo_say"][:fn].call("text" => "hi")).to eq(content: "hi")
   end
