@@ -21,20 +21,23 @@ Elelem.configure do |config|
   config.setup(:mcp) do |agent|
     mcp = Elelem::MCP::Client.memoized
 
-    Thread.new do
-      mcp.tools.each do |name, tool|
-        next if agent.toolbox.tools.key?(name)
+    # One thread per server, so a broken or slow server does not hold back the others.
+    mcp.server_names.each do |server|
+      Thread.new do
+        mcp.tools_for(server).each do |name, tool|
+          next if agent.toolbox.tools.key?(name)
 
-        agent.toolbox.add(
-          name,
-          description: tool[:description],
-          params: tool[:params],
-          required: tool[:required],
-          &tool[:fn]
-        )
+          agent.toolbox.add(
+            name,
+            description: tool[:description],
+            params: tool[:params],
+            required: tool[:required],
+            &tool[:fn]
+          )
+        end
+      rescue StandardError => e
+        $stderr.puts "elelem-mcp: #{server}: #{e.message}"
       end
-    rescue StandardError => e
-      warn "MCP failed: #{e.message}"
     end
   end
 end

@@ -18,20 +18,22 @@ module Elelem
         @servers = {}
       end
 
-      def tools
-        @config.fetch("mcpServers", {}).flat_map do |name, _|
-          server(name).tools.map do |tool|
-            [
-              "#{name}_#{tool["name"]}",
-              {
-                description: tool["description"],
-                params: symbolize(tool.dig("inputSchema", "properties") || {}),
-                required: tool.dig("inputSchema", "required") || [],
-                fn: ->(a) { server(name).call(tool["name"], a) }
-              }
-            ]
-          end
-        end.to_h
+      def server_names
+        @config.fetch("mcpServers", {}).keys
+      end
+
+      def tools_for(name)
+        server(name).tools.to_h do |tool|
+          [
+            "#{name}_#{tool["name"]}",
+            {
+              description: tool["description"],
+              params: symbolize(tool.dig("inputSchema", "properties") || {}),
+              required: tool.dig("inputSchema", "required") || [],
+              fn: ->(a) { server(name).call(tool["name"], a) }
+            }
+          ]
+        end
       end
 
       def close

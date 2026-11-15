@@ -11,6 +11,10 @@ AllCops:
 Metrics:
   Enabled: false
 
+# exe/elelem runs with -W0, which silences Kernel#warn.
+Style/StderrPuts:
+  Enabled: false
+
 Naming/PredicateMethod:
   AllowedMethods:
     - call

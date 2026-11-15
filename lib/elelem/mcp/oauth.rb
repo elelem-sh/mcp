@@ -73,7 +73,7 @@ module Elelem
 
         tokens["access_token"]
       rescue StandardError => e
-        warn "Token refresh failed: #{e.message}"
+        $stderr.puts "elelem-mcp: token refresh failed: #{e.message}"
         authorize
       end
 
@@ -140,7 +140,7 @@ module Elelem
       def open_browser(url)
         commands = %w[xdg-open open start]
         opened = commands.any? { |cmd| system(cmd, url, out: File::NULL, err: File::NULL) }
-        warn "Open this URL in your browser: #{url}" unless opened
+        $stderr.puts "Open this URL in your browser: #{url}" unless opened
       end
 
       def wait_for_callback(expected_state)
