@@ -47,6 +47,14 @@ RSpec.describe Elelem::MCP::Client do
     expect { client.tools_for("x") }.to raise_error("unsupported type: sse")
   end
 
+  it "asks for 2025-11-25 and keeps the version the server answers with" do
+    client.tools_for("echo")
+    server = client.send(:server, "echo")
+
+    expect(Elelem::MCP::PROTOCOL_VERSION).to eq("2025-11-25")
+    expect(server.protocol_version).to eq("2025-06-18")
+  end
+
   it "calls a loaded tool" do
     expect(client.tools_for("echo")["echo_say"][:fn].call("text" => "hi")).to eq(content: "hi")
   end

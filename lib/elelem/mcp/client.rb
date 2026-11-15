@@ -72,7 +72,11 @@ module Elelem
       end
     end
 
+    PROTOCOL_VERSION = "2025-11-25"
+
     module ServerInterface
+      attr_reader :protocol_version
+
       def tools
         request("tools/list")["tools"]
       end
@@ -94,12 +98,15 @@ module Elelem
 
       private
 
+      # Asks for the version this client follows, then speaks whichever the
+      # server answers with.
       def handshake!
-        request("initialize", {
-                  protocolVersion: "2025-06-18",
-                  capabilities: {},
-                  clientInfo: { name: "elelem", version: Elelem::MCP::VERSION }
-                })
+        result = request("initialize", {
+                           protocolVersion: PROTOCOL_VERSION,
+                           capabilities: {},
+                           clientInfo: { name: "elelem", version: Elelem::MCP::VERSION }
+                         })
+        @protocol_version = result&.dig("protocolVersion") || PROTOCOL_VERSION
         notify("notifications/initialized")
       end
     end
@@ -240,6 +247,8 @@ module Elelem
       def request_headers
         base = { "Accept" => "application/json, text/event-stream" }
         base["Mcp-Session-Id"] = @session_id if @session_id
+        # Streamable HTTP needs the negotiated version on every request after initialize.
+        base["MCP-Protocol-Version"] = @protocol_version if @protocol_version
         base["Authorization"] = "Bearer #{@access_token}" if @access_token
         @headers.merge(base)
       end

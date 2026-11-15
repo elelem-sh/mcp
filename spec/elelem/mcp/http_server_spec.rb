@@ -81,6 +81,13 @@ RSpec.describe Elelem::MCP::HttpServer do
       expect(headers["Accept"]).to eq("application/json, text/event-stream")
     end
 
+    it "includes the negotiated protocol version once there is one" do
+      expect(subject.send(:request_headers)).not_to have_key("MCP-Protocol-Version")
+
+      subject.instance_variable_set(:@protocol_version, "2025-11-25")
+      expect(subject.send(:request_headers)["MCP-Protocol-Version"]).to eq("2025-11-25")
+    end
+
     it "includes session ID when set" do
       subject.instance_variable_set(:@session_id, "abc123")
       headers = subject.send(:request_headers)
