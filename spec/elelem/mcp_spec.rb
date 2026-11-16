@@ -1,41 +1,39 @@
 # frozen_string_literal: true
 
+require "open3"
+
 RSpec.describe "the mcp setup" do
-  let(:dir) { Dir.mktmpdir }
-  let(:config) { File.join(dir, "mcp.json") }
-  let(:client) { Elelem::MCP::Client.new([config]) }
-  let(:toolbox) { Elelem::Toolbox.new }
-  let(:setup) do
-    block = nil
-    Elelem::Config.default.configure { |registration| block = registration.setups["mcp"] }
-    block
+  let(:lib) { File.expand_path("../../lib", __dir__) }
+  let(:echo) { File.expand_path("../fixtures/echo_server.rb", __dir__) }
+  let(:script) do
+    'require "elelem/mcp"; ' \
+      "puts Elelem.build(input: Elelem::NullInput.new, output: Elelem::NullOutput.new).toolbox.tools.keys"
   end
 
-  before do
-    echo = { "command" => RbConfig.ruby, "args" => [File.expand_path("../fixtures/echo_server.rb", __dir__)] }
-    servers = { "broken" => { "command" => "/nonexistent/mcp" }, "echo" => echo }
-    File.write(config, JSON.generate("mcpServers" => servers))
-    allow(Elelem::MCP::Client).to receive(:memoized).and_return(client)
+  def build_session_in(dir)
+    servers = {
+      "broken" => { "command" => "/nonexistent/mcp" },
+      "echo" => { "command" => RbConfig.ruby, "args" => [echo] }
+    }
+    FileUtils.mkdir_p(File.join(dir, ".agents"))
+    File.write(File.join(dir, ".agents/mcp.json"), JSON.generate("mcpServers" => servers))
+    Open3.capture3({ "HOME" => dir }, RbConfig.ruby, "-I", lib, "-e", script, chdir: dir)
   end
 
-  after do
-    client.close
-    FileUtils.rm_rf(dir)
+  it "waits for the servers when the input is not interactive, and loads the tools of the working one" do
+    Dir.mktmpdir do |dir|
+      tools, _, status = build_session_in(dir)
+
+      expect(status).to be_success
+      expect(tools.lines(chomp: true)).to include("echo_say")
+    end
   end
 
-  def run_setup
-    setup.call(Struct.new(:toolbox).new(toolbox)).each(&:join)
-  end
+  it "names the server that failed" do
+    Dir.mktmpdir do |dir|
+      _, errors, = build_session_in(dir)
 
-  it "waits for the servers before returning when the input is not interactive" do
-    session = Struct.new(:toolbox, :input).new(toolbox, Elelem::NullInput.new)
-    expect { setup.call(session) }.to output(/broken/).to_stderr
-
-    expect(toolbox.tools.keys).to include("echo_say")
-  end
-
-  it "loads the tools of a working server when another fails, and names the failure" do
-    expect { run_setup }.to output(%r{\Aelelem-mcp: broken: No such file or directory - /nonexistent/mcp\n\z}).to_stderr
-    expect(toolbox.tools.keys).to include("echo_say")
+      expect(errors).to eq("elelem-mcp: broken: No such file or directory - /nonexistent/mcp\n")
+    end
   end
 end
