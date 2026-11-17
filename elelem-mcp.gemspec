@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "base64", "~> 0.3"
-  spec.add_dependency "elelem", ">= 0.12", "< 1"
+  spec.add_dependency "elelem", ">= 0.13.1", "< 1"
   spec.add_dependency "fileutils", "~> 1.8"
   spec.add_dependency "json", "~> 3.0"
   spec.add_dependency "net-http", "~> 0.9"
