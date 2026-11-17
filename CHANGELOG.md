@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/elelem-sh/mcp/compare/v0.2.1...v0.2.2) (2026-11-17)
+
+
+### Bug Fixes
+
+* require elelem &gt;= 0.13.1, the release the specs are written against ([08ee8ac](https://github.com/elelem-sh/mcp/commit/08ee8ace24fc152783a2e26eca1339c8b634130a))
+
 ## [0.2.1](https://github.com/elelem-sh/mcp/compare/v0.2.0...v0.2.1) (2026-11-16)
 
 
