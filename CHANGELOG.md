@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/elelem-sh/mcp/compare/v0.2.2...v0.2.3) (2026-11-18)
+
+
+### Bug Fixes
+
+* **deps:** accept the json that Ruby 4.0 ships ([a94b47c](https://github.com/elelem-sh/mcp/commit/a94b47c36e2c0d719a113574ea9923d72b78adbb))
+
 ## [0.2.2](https://github.com/elelem-sh/mcp/compare/v0.2.1...v0.2.2) (2026-11-17)
 
 
