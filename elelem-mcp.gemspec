@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "base64", "~> 0.3"
   spec.add_dependency "elelem", ">= 0.13.1", "< 1"
   spec.add_dependency "fileutils", "~> 1.8"
-  spec.add_dependency "json", "~> 3.0"
+  spec.add_dependency "json", ">= 2.18"
   spec.add_dependency "net-http", "~> 0.9"
   spec.add_dependency "open3", "~> 0.2"
   spec.add_dependency "securerandom", "~> 0.4"
